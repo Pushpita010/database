@@ -1,0 +1,15 @@
+<h2>Your Grades</h2>
+
+<table border="1">
+  <tr>
+    <th>Subject</th>
+    <th>Marks</th>
+  </tr>
+
+  {% for g in grades %}
+  <tr>
+    <td>{{g[0]}}</td>
+    <td>{{g[1]}}</td>
+  </tr>
+  {% endfor %}
+</table>
