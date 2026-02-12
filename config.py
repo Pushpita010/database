@@ -1,7 +1,7 @@
 # MySQL Database Configuration
 MYSQL_HOST = "localhost"
 MYSQL_USER = "root"
-MYSQL_PASSWORD = "your_password"
+MYSQL_PASSWORD = ""  # Change this to your MySQL password (leave empty if no password)
 MYSQL_DB = "flask_auth"
 
 # Secret key for session
@@ -18,4 +18,5 @@ TEST_USERS = {
 
 # Application Settings
 ITEMS_PER_PAGE = 10
+DEBUG = True
 DEBUG = True
