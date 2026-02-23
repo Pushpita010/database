@@ -1,23 +1,38 @@
 import mysql.connector
 from mysql.connector import Error
+import os
+from dotenv import load_dotenv
+from werkzeug.security import generate_password_hash
+
+# Load environment variables
+load_dotenv()
+
+MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
+MYSQL_USER = os.getenv("MYSQL_USER", "root")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
+MYSQL_DB = os.getenv("MYSQL_DB", "flask_auth")
 
 try:
     # Connect to MySQL without specifying database
     connection = mysql.connector.connect(
-        host='localhost',
-        user='root',
-        password=''
+        host=MYSQL_HOST,
+        user=MYSQL_USER,
+        password=MYSQL_PASSWORD
     )
-    
+
     cursor = connection.cursor()
-    
+
+    # Drop database if it exists (to ensure clean slate)
+    cursor.execute(f"DROP DATABASE IF EXISTS {MYSQL_DB}")
+    print(f"✅ Cleaned up old database (if existed)")
+
     # Create database
-    cursor.execute("CREATE DATABASE IF NOT EXISTS flask_auth")
-    print("✅ Database 'flask_auth' created/verified")
-    
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {MYSQL_DB}")
+    print(f"✅ Database '{MYSQL_DB}' created/verified")
+
     # Use the database
-    cursor.execute("USE flask_auth")
-    
+    cursor.execute(f"USE {MYSQL_DB}")
+
     # Create users table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
@@ -29,7 +44,7 @@ try:
     )
     """)
     print("✅ Table 'users' created/verified")
-    
+
     # Create grades table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS grades (
@@ -40,25 +55,54 @@ try:
     )
     """)
     print("✅ Table 'grades' created/verified")
-    
-    # Insert sample grades for pushpita
-    cursor.execute("DELETE FROM grades WHERE username='pushpita'")
+
+    # Insert test users into users table with hashed passwords
+    cursor.execute(
+        "DELETE FROM users WHERE username IN ('admin', 'student1', 'john')")
+
+    # Hash passwords before inserting
+    admin_hash = generate_password_hash('admin123')
+    student1_hash = generate_password_hash('student@123')
+    john_hash = generate_password_hash('john@password')
+
+    cursor.execute(
+        "INSERT INTO users (username, email, password, fullname) VALUES (%s, %s, %s, %s)",
+        ('admin', 'admin@test.com', admin_hash, 'Admin User')
+    )
+    cursor.execute(
+        "INSERT INTO users (username, email, password, fullname) VALUES (%s, %s, %s, %s)",
+        ('student1', 'student1@test.com', student1_hash, 'Student One')
+    )
+    cursor.execute(
+        "INSERT INTO users (username, email, password, fullname) VALUES (%s, %s, %s, %s)",
+        ('john', 'john@test.com', john_hash, 'John Doe')
+    )
+    print("✅ Test users inserted into database with hashed passwords")
+
+    # Insert sample grades for test users
+    cursor.execute(
+        "DELETE FROM grades WHERE username IN ('admin', 'student1', 'john')")
     cursor.execute("""
     INSERT INTO grades (username, subject, marks) VALUES 
-    ('pushpita', 'ML', 85),
-    ('pushpita', 'DBMS', 90)
+    ('admin', 'ML', 85),
+    ('admin', 'DBMS', 90),
+    ('student1', 'Python', 92),
+    ('student1', 'Web Development', 88),
+    ('student1', 'Database Design', 85),
+    ('john', 'Mathematics', 78),
+    ('john', 'Physics', 82)
     """)
     connection.commit()
-    print("✅ Sample grades inserted for 'pushpita'")
-    
+    print("✅ Sample grades inserted for 'admin', 'student1', and 'john'")
+
     cursor.close()
     connection.close()
-    
+
     print("\n✅ DATABASE SETUP COMPLETE!")
     print("\nYou can now:")
     print("1. Signup: Create new account")
-    print("2. Login: pushpita / pushpita123 (test user)")
-    
+    print(f"2. Login: admin / admin123 (test user)")
+
 except Error as err:
     if err.errno == 2003:
         print("❌ ERROR: MySQL Server is not running!")

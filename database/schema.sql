@@ -15,5 +15,10 @@ CREATE TABLE grades (
     marks INT
 );
 INSERT INTO grades (username, subject, marks) VALUES
-('pushpita', 'ML', 85),
-('pushpita', 'DBMS', 90);
+('admin', 'ML', 85),
+('admin', 'DBMS', 90),
+('student1', 'Python', 92),
+('student1', 'Web Development', 88),
+('student1', 'Database Design', 85),
+('john', 'Mathematics', 78),
+('john', 'Physics', 82);
