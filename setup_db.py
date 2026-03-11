@@ -86,6 +86,9 @@ try:
     INSERT INTO grades (username, subject, marks) VALUES 
     ('admin', 'ML', 85),
     ('admin', 'DBMS', 90),
+    ('admin', 'Data Science', 88),
+    ('admin', 'AI', 92),
+    ('admin', 'Python', 95),
     ('student1', 'Python', 92),
     ('student1', 'Web Development', 88),
     ('student1', 'Database Design', 85),
